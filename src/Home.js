@@ -4,9 +4,9 @@ import Poster from './Poster';
 import axios from 'axios';
 export default function Home() {
 
-    const [movieList, setMovieList] = useState(null);
     const [movieID, setMovieID] = useState(null);
-
+    
+    const [movieList, setMovieList] = useState(null);
     useEffect(() => {
         const MovieListRequest = axios.get('https://mock-api.driven.com.br/api/v4/cineflex/movies');
 

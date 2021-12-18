@@ -4,6 +4,7 @@ import Home from './Home'
 import TopBar from './TopBar'
 import Sessoes from './Sessoes'
 import "./reset.css"
+import Seats from './Seats'
 
 export default function App() {
     return (
@@ -12,6 +13,7 @@ export default function App() {
             <Routes>
                 <Route path='/' element={<Home/>}/>
                 <Route path='/sessoes/:idFilme' element={<Sessoes/>}/>
+                <Route path='/assentos/:idSessao' element={<Seats/>}/>
             </Routes>
         </BrowserRouter>
     )
