@@ -11,9 +11,12 @@ import "./reset.css";
 export default function App() {
     const [selectedSeatsIDs, setSelectedSeatsIDs] = useState([]);
     const [selectedSeatsNum, setSelectedSeatsNum] = useState([]);
-
+    const [movie, setMovie] = useState('');
+    const [section, setSection] = useState('');
     const [name, setName] = useState('');
     const [CPF, setCPF] = useState('');
+
+
 
     return (
         <BrowserRouter>
@@ -30,8 +33,10 @@ export default function App() {
                     setName={setName}
                     CPF={CPF}
                     setCPF={setCPF}
+                    setSection={setSection}
+                    setMovie={setMovie}
                 />} />
-                <Route path='/sucesso' element={<Sucesso selectedSeatsIDs={selectedSeatsIDs} selectedSeatsNum={selectedSeatsNum} />} />
+                <Route path='/sucesso' element={<Sucesso name={name} CPF={CPF} movie={movie} section={section} selectedSeatsIDs={selectedSeatsIDs} selectedSeatsNum={selectedSeatsNum} />} />
             </Routes>
         </BrowserRouter>
     )

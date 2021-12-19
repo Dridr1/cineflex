@@ -13,7 +13,7 @@ export default function Sessoes() {
     useEffect(() => {
         const SectionsListRequest = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/movies/${idFilme}/showtimes`);
         SectionsListRequest.then(promise => setSectionsList(promise.data));
-    }, []);
+    }, [idFilme]);
 
     if (sectionsList === null) {
         return (

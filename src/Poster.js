@@ -7,7 +7,7 @@ export default function Poster({ CurrentMovieID, imageURL, id, setMovieID }) {
     return (
         <Link to={`/sessoes/${id}`}>
             <PosterContainer >
-                <img onClick={() => { setMovieID(id); console.log(id) }} src={imageURL} alt='Movie' />
+                <img onClick={() => { setMovieID(id)}} src={imageURL} alt='Movie' />
             </PosterContainer>
         </Link>
 

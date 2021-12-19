@@ -6,23 +6,28 @@ import BottomBar from './BottomBar';
 
 import React from 'react'
 
-export default function Seats({ name, setName, CPF, setCPF, setSelectedSeatsIDs, setSelectedSeatsNum, selectedSeatsNum, selectedSeatsIDs }) {
+export default function Seats({setMovie, setSection, name, setName, CPF, setCPF, setSelectedSeatsIDs, setSelectedSeatsNum, selectedSeatsNum, selectedSeatsIDs }) {
+
+
 
     const navigate = useNavigate();
-
     const { idSessao } = useParams();
     const [sectionInfos, setSectionsInfos] = useState(null);
 
-    let allFilled = name !== "" && CPF !== "" && CPF.length === 11 && selectedSeatsNum.length > 0;
+    let allFilled = name !== "" && CPF !== "" && (CPF.length === 11 || CPF.length === 14) && selectedSeatsNum.length > 0;
 
     useEffect(() => {
         const seatsRequest = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSessao}/seats`);
-        seatsRequest.then(promise => setSectionsInfos(promise.data));
-    }, []);
+        seatsRequest.then(promise => {
+            setSectionsInfos(promise.data);
+            setMovie(promise.data.movie.title);
+            setSection(`${promise.data.day.date} ${promise.data.name}`);
+        });
+    }, [idSessao, setMovie, setSection]);
 
     function handleSelectUnavailableSeat(e) {
         alert('Esse assento não está disponível');
-    }
+    };
 
     if (sectionInfos === null) {
         return (
@@ -93,12 +98,11 @@ export default function Seats({ name, setName, CPF, setCPF, setSelectedSeatsIDs,
                 <label>CPF do comprador</label>
                 <input onChange={e => {
                     setCPF(e.target.value);
-                    console.log(allFilled);
                 }} placeholder='Digite seu CPF...' />
 
 
                 {/* <Link style={{pointerEvents: allFilled ? 'auto' : 'none'}} disabled={true} to={'/sucesso'}> */}
-                <Button allFilled={allFilled}
+                <Button disabled={!allFilled} allFilled={allFilled}
                     onClick={() => {
                         const data = {
                             ids: selectedSeatsIDs,
@@ -108,7 +112,6 @@ export default function Seats({ name, setName, CPF, setCPF, setSelectedSeatsIDs,
                         const promise = axios.post('https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many', data);
                         promise.then(() => {
                             navigate('/sucesso');
-                            console.log(promise);
                         });
                     }}>
                     <span>Reservar assento(s)</span>

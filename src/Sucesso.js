@@ -1,26 +1,50 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 import styled from 'styled-components'
 
-export default function Sucesso({selectedSeatsIDs, selectedSeatsNum}) {
+export default function Sucesso({ name, CPF, movie, section, selectedSeatsNum }) {
+
+    function treatCPFEntry(cpf) {
+        let noSymbolsCPF = cpf.replace(/[^0-9]/g, '');
+        let new_str = '';
+
+        for (let i = 0; i < noSymbolsCPF.length; i++) {
+            if (i === 3 || i === 6) new_str += `.${noSymbolsCPF[i]}`;
+            else if (i === 9) new_str += `-${noSymbolsCPF[i]}`;
+            else new_str += `${noSymbolsCPF[i]}`;
+        }
+
+        return new_str;
+    }
+
+    const cpf_treated = treatCPFEntry(CPF);
+
     return (
         <SucessoContainer>
             <InfoContainer>
                 <h2>Filme e sessão</h2>
-                <br/>
-                <span>Enola Holmes</span><br/>
-                <span>24/06/2022 15:00</span>
+                <br />
+                <span>{movie}</span><br />
+                <span>{section}</span>
             </InfoContainer>
             <InfoContainer>
                 <h2>Ingressos</h2>
-                <br/>
-                {selectedSeatsNum.map(seatNum => <><span>Assento {seatNum}</span><br/></>)}
+                <br />
+                <ul>
+                    {selectedSeatsNum.map(seatNum => <li key={seatNum}>Assento {seatNum}</li>)}
+                </ul>
             </InfoContainer>
             <InfoContainer>
                 <h2>Comprador</h2>
-                <br/>
-                <span>Nome: Joãozinho da Silvassauro</span><br/>
-                <span>CPF: 023.944.713-10</span>
+                <br />
+                <span>Nome: {name}</span><br />
+                <span>CPF: {cpf_treated}</span>
             </InfoContainer>
+            <ButtonContainer>
+                <Link to='/'>
+                    <button>Voltar para a Home</button>
+                </Link>
+            </ButtonContainer>
         </SucessoContainer>
     )
 }
@@ -43,4 +67,26 @@ margin-bottom: 50px;
         font-size: 22px;
         line-height: 26px;
     }
+    li{
+        font-size: 22px;
+        line-height: 26px;
+    }
 `;
+
+const ButtonContainer = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+    button{
+        width: 225px;
+        height: 42px;
+        border: none;
+        background: #E8833A;
+        border-radius: 3px;
+        color: white;
+        font-size: 18px;
+        line-height: 21px;
+    }
+`
