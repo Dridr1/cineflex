@@ -6,26 +6,20 @@ import BottomBar from './BottomBar';
 
 import React from 'react'
 
-export default function Seats() {
+export default function Seats({ setName, setCPF, setSelectedSeatsIDs, setSelectedSeatsNum }) {
 
     const { idSessao } = useParams();
-
     const [sectionInfos, setSectionsInfos] = useState(null);
 
-    const [selectedSeatsIDs, setSelectedSeatsIDs] = useState([]);
-
-    const [selectedSeatsNum, setSelectedSeatsNum] = useState([]);
-
-    const [name, setName] = useState(null);
-
-    const [CPF, setCPF] = useState(null);
+    let selectedSeatsArr = [];
+    let selectedSeatsIDArr = [];
 
     useEffect(() => {
         const seatsRequest = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSessao}/seats`);
         seatsRequest.then(promise => setSectionsInfos(promise.data));
     }, []);
 
-    function handleSelectUnavailableSeat(e){
+    function handleSelectUnavailableSeat(e) {
         alert('Esse assento não está disponível');
     }
 
@@ -43,21 +37,30 @@ export default function Seats() {
             <SeatsSubtitle><span>{`Selecione o(s) assento(s)`}</span></SeatsSubtitle>
             <BottomBar imgURL={sectionInfos.movie.posterURL} movieTitle={sectionInfos.movie.title} session={`${sectionInfos.day.weekday} - ${sectionInfos.name}`} />
             <SeatsList>
-                {sectionInfos.seats.map((seat, index) => {
+                {sectionInfos.seats.map((seat, index,) => {
                     if (seat.isAvailable) {
 
                         return (
-                            <Seat 
-                            id={seat.id} 
-                            borderColor="#808F9D" 
-                            backgroundColor="#C3CFD9" 
-                            onClick={(e) =>{
-                                e.target.parentNode.style.backgroundColor = '#8DD7CF';
-                                e.target.parentNode.style.border = '1px solid #1AAE9E';
-                                setSelectedSeatsIDs([...selectedSeatsIDs, seat.id]);
-                                setSelectedSeatsNum([...selectedSeatsNum, (index+1)]);
-                            }
-                            } 
+                            <Seat
+                                id={seat.id}
+                                borderColor="#808F9D"
+                                backgroundColor="#C3CFD9"
+                                onClick={(e) => {
+                                    if (e.target.parentNode.style.backgroundColor !== 'rgb(141, 215, 207)') {
+                                        e.target.parentNode.style.backgroundColor = '#8DD7CF';
+                                        e.target.parentNode.style.border = '1px solid #1AAE9E';
+                                        selectedSeatsArr.push(index+1);
+                                        selectedSeatsIDArr.push(seat.id);
+                                        console.log(selectedSeatsArr);
+                                    }
+                                    else{
+                                        e.target.parentNode.style.backgroundColor = '#C3CFD9';
+                                        e.target.parentNode.style.border = '1px solid #808F9D';
+                                        selectedSeatsArr.splice(selectedSeatsArr.indexOf((index+1)),1);
+                                        console.log(selectedSeatsArr)
+                                    }
+                                }
+                                }
                                 key={seat.id}>
                                 <span onClick={handleSelectSeat}>{index + 1}</span>
                             </Seat>
@@ -209,4 +212,4 @@ const Button = styled.button`
     span{
         color: white;
     }
-`
+`;
