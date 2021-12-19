@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
 import BottomBar from './BottomBar';
 
 import React from 'react'
 
-export default function Seats({ setName, setCPF, setSelectedSeatsIDs, setSelectedSeatsNum }) {
+export default function Seats({ name, setName, CPF, setCPF, setSelectedSeatsIDs, setSelectedSeatsNum, selectedSeatsNum, selectedSeatsIDs }) {
+
+    const navigate = useNavigate();
 
     const { idSessao } = useParams();
     const [sectionInfos, setSectionsInfos] = useState(null);
 
-    let selectedSeatsArr = [];
-    let selectedSeatsIDArr = [];
+    let allFilled = name !== "" && CPF !== "" && CPF.length === 11 && selectedSeatsNum.length > 0;
 
     useEffect(() => {
         const seatsRequest = axios.get(`https://mock-api.driven.com.br/api/v4/cineflex/showtimes/${idSessao}/seats`);
@@ -21,10 +22,6 @@ export default function Seats({ setName, setCPF, setSelectedSeatsIDs, setSelecte
 
     function handleSelectUnavailableSeat(e) {
         alert('Esse assento não está disponível');
-    }
-
-    function handleSelectSeat(e) {
-
     }
 
     if (sectionInfos === null) {
@@ -42,34 +39,35 @@ export default function Seats({ setName, setCPF, setSelectedSeatsIDs, setSelecte
 
                         return (
                             <Seat
+                                isAvailable={true}
                                 id={seat.id}
                                 borderColor="#808F9D"
                                 backgroundColor="#C3CFD9"
                                 onClick={(e) => {
-                                    if (e.target.parentNode.style.backgroundColor !== 'rgb(141, 215, 207)') {
-                                        e.target.parentNode.style.backgroundColor = '#8DD7CF';
-                                        e.target.parentNode.style.border = '1px solid #1AAE9E';
-                                        selectedSeatsArr.push(index+1);
-                                        selectedSeatsIDArr.push(seat.id);
-                                        console.log(selectedSeatsArr);
+                                    if (e.target.style.backgroundColor !== 'rgb(141, 215, 207)') {
+                                        e.target.style.backgroundColor = '#8DD7CF';
+                                        e.target.style.border = '1px solid #1AAE9E';
+                                        setSelectedSeatsNum([...selectedSeatsNum, (index + 1)]);
+                                        setSelectedSeatsIDs([...selectedSeatsIDs, seat.id]);
                                     }
-                                    else{
-                                        e.target.parentNode.style.backgroundColor = '#C3CFD9';
-                                        e.target.parentNode.style.border = '1px solid #808F9D';
-                                        selectedSeatsArr.splice(selectedSeatsArr.indexOf((index+1)),1);
-                                        console.log(selectedSeatsArr)
+                                    else {
+                                        e.target.style.backgroundColor = '#C3CFD9';
+                                        e.target.style.border = '1px solid #808F9D';
+                                        const filteredNum = selectedSeatsNum.filter(num => num !== index + 1);
+                                        setSelectedSeatsNum(filteredNum);
+
                                     }
                                 }
                                 }
                                 key={seat.id}>
-                                <span onClick={handleSelectSeat}>{index + 1}</span>
+                                {index + 1}
                             </Seat>
                         );
                     }
                     else {
                         return (
-                            <Seat borderColor="#F7C52B" backgroundColor="#FBE192" onClick={handleSelectUnavailableSeat} key={seat.id}>
-                                <span>{index + 1}</span>
+                            <Seat isAvailable={false} borderColor="#F7C52B" backgroundColor="#FBE192" onClick={handleSelectUnavailableSeat} key={seat.id}>
+                                {index + 1}
                             </Seat>
                         );
                     }
@@ -89,13 +87,35 @@ export default function Seats({ setName, setCPF, setSelectedSeatsIDs, setSelecte
                     <span>Indisponível</span>
                 </div>
             </SeatsLegend>
-
             <Inputs>
                 <label>Nome do comprador</label>
                 <input onChange={e => setName(e.target.value)} placeholder='Digite seu nome...' type="text" />
                 <label>CPF do comprador</label>
-                <input onChange={e => setCPF(e.target.value)} placeholder='Digite seu CPF...' />
-                <Button><span>{`Reservar assento(s)`}</span></Button>
+                <input onChange={e => {
+                    setCPF(e.target.value);
+                    console.log(allFilled);
+                }} placeholder='Digite seu CPF...' />
+
+
+                {/* <Link style={{pointerEvents: allFilled ? 'auto' : 'none'}} disabled={true} to={'/sucesso'}> */}
+                <Button allFilled={allFilled}
+                    onClick={() => {
+                        const data = {
+                            ids: selectedSeatsIDs,
+                            name: name,
+                            cpf: CPF
+                        };
+                        const promise = axios.post('https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many', data);
+                        promise.then(() => {
+                            navigate('/sucesso');
+                            console.log(promise);
+                        });
+                    }}>
+                    <span>Reservar assento(s)</span>
+                </Button>
+                {/* </Link> */}
+
+
             </Inputs>
         </SeatsScreen>
     );
@@ -109,6 +129,7 @@ const SeatsScreen = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 130px;
 `;
 
 const SeatsSubtitle = styled.div`
@@ -117,7 +138,6 @@ const SeatsSubtitle = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    
     span{
         vertical-align: center;
         font-family: 'Roboto';
@@ -136,27 +156,17 @@ const SeatsList = styled.div`
 const Seat = styled.div`
     width: 26px;
     height: 25px;
-
     background: ${props => props.backgroundColor};
     border: 1px solid ${props => props.borderColor};
     border-radius: 12px;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     font-family: 'Roboto';
-    span{
-        width: 100%;
-        height: 100%;
-        font-size: 11px;
-        line-height: 13px;
-        text-align: center;
-        display: flex;
-        align-items: center;  
-        justify-content: center
-    }
-
+    cursor: ${props => props.isAvailable ? 'pointer;' : 'not-allowed;'}
+    line-height: 13px;
+    text-align: center;
+    font-size: 11px
 `;
 
 const SeatsLegend = styled.div`
@@ -184,13 +194,20 @@ const Inputs = styled.div`
     justify-content: center;
     align-items: center;
     gap: 7px;
-    margin-top: 42px;
+    margin-top: 40px;
+    margin-bottom:130px;
     input{
         width: 100%;
         height: 51px;
         background: #FFFFFF;
         border: 1px solid #D5D5D5;
         border-radius: 3px;
+        padding-left: 18px;
+        font-size: 18px;
+        line-height: 21px;
+        ::placeholder{
+            font-style: italic;
+        }
     }
     label{
         width: 100%;
@@ -200,16 +217,18 @@ const Inputs = styled.div`
     }
 `;
 const Button = styled.button`
-    margin-bottom: 130px;
-    border: none;
-    background: #E8833A;
-    border-radius: 3px;
-    margin-top: 50px;
+    margin-top: 57px;
     width: 225px;
     height: 42px;
     background: #E8833A;
+    opacity: ${props => props.allFilled ? 1 : 0.6};
     border-radius: 3px;
-    span{
-        color: white;
+    border: none;
+    color: white;
+    font-size: 18px;
+    line-height: 21px;
+    cursor: ${props => props.allFilled ? 'pointer' : 'not-allowed'};
+    & :first-child{
+        cursor: ${props => props.allFilled ? 'pointer;' : 'not-allowed;'}
     }
 `;

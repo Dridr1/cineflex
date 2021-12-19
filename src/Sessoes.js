@@ -38,11 +38,11 @@ export default function Sessoes() {
                                 <ShowTimes>
                                     {section.showtimes.map(showtime => {
                                         return (
-                                            <div key={showtime.id}>
-                                                <Link style={{textDecoration: 'none', color: 'white'}} to=  {`/assentos/${showtime.id}`}>
+                                            <Link key={showtime.id} style={{ textDecoration: 'none', color: 'white' }} to={`/assentos/${showtime.id}`}>
+                                                <div >
                                                     <span>{showtime.name}</span>
-                                                </Link>
-                                            </div>
+                                                </div>
+                                            </Link>
                                         );
                                     })}
                                 </ShowTimes>
