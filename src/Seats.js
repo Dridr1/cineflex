@@ -120,6 +120,8 @@ export default function Seats({setMovie, setSection, name, setName, CPF, setCPF,
 
 
             </Inputs>
+            <br/>
+            .
         </SeatsScreen>
     );
 }
@@ -232,6 +234,6 @@ const Button = styled.button`
     line-height: 21px;
     cursor: ${props => props.allFilled ? 'pointer' : 'not-allowed'};
     & :first-child{
-        cursor: ${props => props.allFilled ? 'pointer;' : 'not-allowed;'}
+        cursor: ${props => props.allFilled ? 'pointer;' : 'not-allowed;'};
     }
 `;

@@ -33,6 +33,7 @@ const BottomBarContainer = styled.div`
     justify-content: flex-start;
     padding-left: 10px;
     gap: 14px;
+    z-index: 3;
     & p{
         font-size: 26px;
         line-height: 30px;
